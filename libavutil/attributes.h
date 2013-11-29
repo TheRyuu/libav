@@ -119,6 +119,8 @@
 
 #if AV_GCC_VERSION_AT_LEAST(2,5)
 #    define av_noreturn __attribute__((noreturn))
+#elif defined(_MSC_VER)
+#    define av_noreturn __declspec(noreturn)
 #else
 #    define av_noreturn
 #endif
