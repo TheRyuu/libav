@@ -4445,9 +4445,11 @@ elif enabled pathscale; then
     add_cflags -fstrict-overflow -OPT:wrap_around_unsafe_opt=OFF
 elif enabled_any msvc icl; then
     enabled x86_32 && disable aligned_stack
-    enabled_all x86_32 debug && add_cflags -Oy-
-    enabled debug && add_ldflags -debug
+    #enabled debug && check_cpp_condition "windows.h" "_MSC_VER >= 1800" && add_cflags -FS
+    #enabled debug && add_cflags -Fdlibav-debug.pdb
+    #enabled debug && add_ldflags -debug -opt:ref,icf
     enable pragma_deprecated
+    #rm VC*.pdb
     if enabled icl; then
         # -Qansi-alias is basically -fstrict-aliasing, but does not work
         # (correctly) on icl 13.x.
