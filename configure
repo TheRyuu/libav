@@ -3795,8 +3795,6 @@ case $target_os in
         elif enabled arm; then
             LIBTARGET=arm-wince
         fi
-        check_ldflags -Wl,--nxcompat
-        check_ldflags -Wl,--dynamicbase
         shlibdir_default="$bindir_default"
         SLIBPREF=""
         SLIBSUF=".dll"
@@ -3812,6 +3810,17 @@ case $target_os in
         dlltool="${cross_prefix}dlltool"
         ranlib=:
         enable dos_paths
+        check_ldflags -Wl,--nxcompat,--dynamicbase
+        # Lets work around some stupidity in binutils.
+        # ld will strip relocations from executables even though we need them
+        # for dynamicbase (ASLR).  Using -pie does retain the reloc section
+        # however ld then forgets what the entry point should be (oops) so we
+        # have to manually (re)set it.
+        if enabled x86_32; then
+            add_ldexeflags -Wl,--pic-executable,-e,_mainCRTStartup
+        elif enabled x86_64; then
+            add_ldexeflags -Wl,--pic-executable,-e,mainCRTStartup
+        fi
         ;;
     win32|win64)
         disable symver
